@@ -4,6 +4,7 @@ const fs = require('fs');
 const path = require('path');
 const pdf = require('pdf-parse');
 const { Parser } = require('json2csv');
+const nlp = require('compromise')
 
 const dateRe = /\d+\/\d+\/\d+ \d+:\d+:\d+ [AP]M\s+/g
 
@@ -22,7 +23,7 @@ const getCorpus = async (files) => {
 
 const getFileNames = (dir) => fs.readdirSync(dir).map(f => path.join(dir, f));
 
-const parseData = async (corpus) => {
+const parseJSON = async (corpus) => {
   const data = []
   const responses = corpus.split(dateRe)
   // remove first empty string
@@ -40,13 +41,20 @@ const parseData = async (corpus) => {
   return data;
 }
 
+
+const analyze = async (json) => {
+  let doc = nlp(json.map(d => d.text).join('\n'))
+  console.log(doc.verbs())
+}
+
 const run = async () => {
-  const csvParser = new Parser()
+  // const csvParser = new Parser()
   const files = getFileNames('./data')
   const corpus = await getCorpus(files)
-  const responses = await parseData(corpus);
-  fs.writeFileSync("data.json", JSON.stringify(responses, null, 2));
-  fs.writeFileSync("data.csv", csvParser.parse(responses))
+  const responses = await parseJSON(corpus);
+  const analysis = analyze(responses);
+  // fs.writeFileSync("data.json", JSON.stringify(responses, null, 2));
+  // fs.writeFileSync("data.csv", csvParser.parse(responses))
 }
 
 run();
