@@ -1,18 +1,13 @@
 #!/usr/bin/env node
 
 const fs = require('fs');
-const glob = require('glob-fs')();
+const path = require('path');
 const pdf = require('pdf-parse');
-const Sentiment = require('sentiment');
 const { Parser } = require('json2csv');
 
 const dateRe = /\d+\/\d+\/\d+ \d+:\d+:\d+ [AP]M\s+/g
-const sentiment = new Sentiment()
 
-
-
-
-const getCombinedText = async (files) => {
+const getCorpus = async (files) => {
   let output = '';
   let buf
   let data
@@ -25,6 +20,8 @@ const getCombinedText = async (files) => {
 }
 
 
+const getFileNames = (dir) => fs.readdirSync(dir).map(f => path.join(dir, f));
+
 const parseData = async (corpus) => {
   const data = []
   const responses = corpus.split(dateRe)
@@ -36,9 +33,6 @@ const parseData = async (corpus) => {
     const text = responses.shift().trim().split("\n").join('')
     data.push({
       timestamp: matches[0].trim(),
-      sentiment: sentiment.analyze(text).score,
-      position: "",
-      notes: "",
       text,
     })
   }
@@ -48,8 +42,8 @@ const parseData = async (corpus) => {
 
 const run = async () => {
   const csvParser = new Parser()
-  const files = glob.readdirSync("data/*.pdf")
-  const corpus = await getCombinedText(files)
+  const files = getFileNames('./data')
+  const corpus = await getCorpus(files)
   const responses = await parseData(corpus);
   fs.writeFileSync("data.json", JSON.stringify(responses, null, 2));
   fs.writeFileSync("data.csv", csvParser.parse(responses))
