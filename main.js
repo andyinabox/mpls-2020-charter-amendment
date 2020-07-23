@@ -51,8 +51,10 @@ const run = async () => {
   const files = glob.readdirSync("data/*.pdf")
   const corpus = await getCombinedText(files)
   const responses = await parseData(corpus);
+  // remove extra data for csv version
+  const csvData = responses.map(({ timestamp, text }) => ({ timestamp, text }))
   fs.writeFileSync("data.json", JSON.stringify(responses, null, 2));
-  fs.writeFileSync("data.csv", csvParser.parse(responses))
+  fs.writeFileSync("data.csv", csvParser.parse(csvData))
 }
 
 run();
