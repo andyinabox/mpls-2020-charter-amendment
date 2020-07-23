@@ -10,6 +10,14 @@ Results are committed to the repo and included in a public Google Doc:
 
 https://docs.google.com/spreadsheets/d/1WvYsjbL0aheX-9nXI5Uux1tTrXbJ4f46uQBL6dPKenA
 
+## Files
+
+ - `data/` contains source PDF files published by the city clerk
+ - `data.csv` tabular data with just the timestamp and text
+ - `data.json` json data including a column for basic sentiment analysis score
+ - `summary.pdf` the Charter Commission's summary of public comments
+
+
 ## Running the script
 
 You'll need `nodejs` and `npm` [installed on your system](https://nodejs.org/en/download/).
